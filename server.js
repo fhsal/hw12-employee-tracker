@@ -241,12 +241,12 @@ function viewDeptBudget(){
     function addDepartment() {
       inquirer.prompt({
           type: "input",
-          message: "Enter name of the new department?",
+          message: "Enter name of the new department",
           name: "deptName"
       }).then(function(answer){
           connection.query("INSERT INTO dept (deptName) VALUES (?)", [answer.deptName] , function(err, res) {
               if (err) throw err;
-              viewDepartments();
+              viewDepartment();
          })
       })
   }
