@@ -39,7 +39,7 @@ function selectAction() {
         "Search for an employee",
         "View department salary budget",
         // "Update employee role",
-        // "Remove an employee",
+        "Remove an employee",
         // "View employees by Manager",
         // "View a department budget",
         // "Delete a role",
@@ -78,6 +78,9 @@ function selectAction() {
           break;
         case "View department salary budget":
           viewDeptBudget();
+          break;
+        case "Remove an employee":
+          removeEmployee();
           break;
 
       }
@@ -209,7 +212,6 @@ function viewDeptBudget(){
       });
     }
 
-
     function addRole() {
       inquirer
         .prompt([
@@ -237,7 +239,6 @@ function viewDeptBudget(){
         });
     }
 
-
     function addDepartment() {
       inquirer.prompt({
           type: "input",
@@ -251,5 +252,18 @@ function viewDeptBudget(){
       })
   }
 
-
+  function removeEmployee() {
+    inquirer.prompt({
+        type: "input",
+        message: "Enter ID of employee to remove",
+        name: "empID"
+    }).then(function(answer){
+      // let value = [answer.empID];
+        connection.query("DELETE FROM emp WHERE id = ?", [answer.empID], function(err, res) {
+            if (err) throw err;
+            viewEmployees();
+            selectAction();
+       })
+    })
+}
 
