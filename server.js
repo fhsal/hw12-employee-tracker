@@ -1,17 +1,4 @@
 // Require Dependencies
-// const express = require("express");
-
-// // Initialize express app and using process.env port so that Heroku can assign port or use 3000 (locally)
-
-// const app = express();
-// const PORT = process.env.PORT || 3300;
-
-// // setting up express
-
-// app.use(express.urlencoded({ extended: true }));
-// app.use(express.json());
-// app.use(express.static("public"));
-
 
 const inquirer = require("inquirer");
 const mysql = require("mysql");
@@ -26,6 +13,9 @@ const connection = mysql.createConnection({
   database: "employee_db"
 });
 
+
+// verify the below is really needed 
+
 connection.connect(function(err) {
   if (err) throw err;
   console.log("connected as id " + connection.threadId);
@@ -33,7 +23,8 @@ connection.connect(function(err) {
   //  connection.end();//
 });
 
-//What the user will first see once logged into node
+//prompt user with actions using inquirer
+
 function selectAction() {
   inquirer
     .prompt({
@@ -45,6 +36,8 @@ function selectAction() {
         "Add employee",
         "Add department",
         "Add role",
+        "Search for an employee",
+        "View department salary budget",
         // "Update employee role",
         // "Remove an employee",
         // "View employees by Manager",
@@ -59,6 +52,15 @@ function selectAction() {
       console.log("You entered: " + result.action);
 
       switch (result.action) {
+        case "View employees":
+          viewEmployees();
+          break;
+        case "View roles":
+          viewRoles();
+          break;
+        case "View departments":
+          viewDepartment();
+          break;
         case "Add department":
           addDepartment();
           break;
@@ -68,27 +70,23 @@ function selectAction() {
         case "Add employee":
           addEmployee();
           break;
-        case "View departments":
-          viewDepartment();
-          break;
-        case "View roles":
-          viewRoles();
-          break;
-        case "View employees":
-          viewEmployees();
-          break;
         case "Update employee role":
           updateEmployee();
           break;
-        // default:
-          // finished();
+        case "Search for an employee":
+          employeeSearch();
+          break;
+        case "View department salary budget":
+          viewDeptBudget();
+          break;
+
       }
     });
 }
 
 //viewing functions - results displayed to user in table format using console.table
 
-function viewDepartments() {
+function viewDepartment() {
     let query = "SELECT * FROM dept";
     connection.query(query, function(err, res) {
       if (err) throw err;
@@ -115,6 +113,63 @@ function viewRoles() {
     });
   }
 
+
+function viewSingleEmployee() {
+
+    var query = "SELECT last_name, first_name, role_id, manager_id FROM emp WHERE ?";
+    connection.query(query, { last_name: lastName }, function(err, res) {
+      if (err) throw err;}
+    )}
+
+
+    function employeeSearch() {
+      inquirer
+        .prompt({
+          name: "lastName",
+          type: "input",
+          message: "Enter last name of employee you would like to view"
+        })
+        .then(function(answer) {
+          var query = "SELECT last_name, first_name, role_id, manager_id FROM emp WHERE ?";
+          connection.query(query, { last_name: answer.lastName }, function(err, res) {
+            if (err) throw err;
+            console.table(res);
+            selectAction();
+          });
+        });
+    }
+
+function viewDeptBudget(){
+
+    inquirer
+    .prompt({
+      name: "deptID",
+      type: "input",
+      message: "Enter the department number you would like to see the total salary budget for"
+    })
+    .then(function(answer) {
+      
+// query joins three tables:  role, emp and dept 
+
+      var query = "SELECT role.department_id, dept.deptName, SUM(salary) FROM emp INNER JOIN role ON role.id=emp.role_id JOIN dept ON role.department_id=dept.id WHERE ?";
+
+      connection.query(query, { department_id: answer.deptID }, function(err, res) {
+        if (err) throw err;
+        console.table(res);
+        selectAction();
+      });
+    });
+  
+  
+  }
+
+
+
+
+
+
+
+// functions to add employee, role and dept 
 
   function addEmployee() {
     inquirer
@@ -148,7 +203,8 @@ function viewRoles() {
           // console.log(entry);
           console.log("Here is the updated employee listing");   
           // viewSingleEmployee(answer.lastName, answer.firstName)        
-          viewEmployees();        ;      
+          // viewEmployees();   
+          viewSingleEmployee(answer.lastName);      
         });
       });
     }
