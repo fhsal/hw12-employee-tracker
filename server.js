@@ -29,13 +29,12 @@ const connection = mysql.createConnection({
 connection.connect(function(err) {
   if (err) throw err;
   console.log("connected as id " + connection.threadId);
-
-  startScreen();
+  selectAction();
   //  connection.end();//
 });
 
 //What the user will first see once logged into node
-function startScreen() {
+function selectAction() {
   inquirer
     .prompt({
       type: "list",
@@ -44,15 +43,14 @@ function startScreen() {
         "View employees",
         "View roles",
         "Add employee",
-        // "Add department",
-        // "Add role",
+        "Add department",
+        "Add role",
         // "Update employee role",
         // "Remove an employee",
         // "View employees by Manager",
         // "View a department budget",
         // "Delete a role",
         // "Delete a department",
-        "finish",
       ],
       message: "Welcome to the Employee Tracker!  Choose an action",
       name: "action"
@@ -82,20 +80,20 @@ function startScreen() {
         case "Update employee role":
           updateEmployee();
           break;
-        default:
-          finished();
+        // default:
+          // finished();
       }
     });
 }
 
 //viewing functions - results displayed to user in table format using console.table
 
-function viewDepartment() {
+function viewDepartments() {
     let query = "SELECT * FROM dept";
     connection.query(query, function(err, res) {
       if (err) throw err;
       console.table(res);
-      startScreen();
+      selectAction();
     });
   }
   
@@ -104,7 +102,7 @@ function viewRoles() {
     connection.query(query, function(err, res) {
       if (err) throw err;
       console.table(res);
-      startScreen();
+      selectAction();
     });
   }
   
@@ -113,9 +111,10 @@ function viewRoles() {
     connection.query(query, function(err, res) {
       if (err) throw err;
       console.table(res);
-      startScreen();
+      selectAction();
     });
   }
+
 
   function addEmployee() {
     inquirer
@@ -144,15 +143,57 @@ function viewRoles() {
       .then(function(answer) {
         connection.query("INSERT INTO emp (last_name, first_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [answer.lastName, answer.firstName, answer.roleID, answer.managerID], function(err, res) {
           if (err) throw err;
+          // let entry = "select * from emp WHERE last_name = lastName AND firstName = firstName";
           console.table(res);
-          console.log("Here is the updated employee listing");  
-          viewEmployees();      
+          // console.log(entry);
+          console.log("Here is the updated employee listing");   
+          // viewSingleEmployee(answer.lastName, answer.firstName)        
+          viewEmployees();        ;      
         });
       });
     }
 
 
-function finished() {
-  connection.end();
-  process.exit();
-}
+    function addRole() {
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            message: "Enter name of the new role",
+            name: "roleName"
+          },
+          {
+            type: "input",
+            message: "Enter the salary for this role",
+            name: "roleComp"
+          },
+          {
+            type: "input",
+            message: "Enter the department id number for this role",
+            name: "deptID"
+          }
+        ])
+        .then(function(answer) {
+          connection.query("INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)", [answer.roleName, answer.roleComp, answer.deptID], function(err, res) {
+            if (err) throw err;
+            viewRoles();
+          });
+        });
+    }
+
+
+    function addDepartment() {
+      inquirer.prompt({
+          type: "input",
+          message: "Enter name of the new department?",
+          name: "deptName"
+      }).then(function(answer){
+          connection.query("INSERT INTO dept (deptName) VALUES (?)", [answer.deptName] , function(err, res) {
+              if (err) throw err;
+              viewDepartments();
+         })
+      })
+  }
+
+
+
