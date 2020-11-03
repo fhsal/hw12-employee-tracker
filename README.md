@@ -4,15 +4,15 @@
 
 This assignment involved building a node.js command line application to manage employee information.  The instructions specified creating three SQL tables for employee, department and role to allow a user to perform the functions of:
 
- (a) viewing employees/departments/roles; 
- (b) adding employees/departments/roles; 
- (c) updating the role of a specified employee; 
+ (a) viewing employees/departments/roles 
+ (b) adding employees/departments/roles
+ (c) updating the role of a specified employee 
  
  and (optionally) supporting 
  
- (d) viewing of a department cumulative salary budget; 
- (e) viewing a team by manager;
- (e) removing an employee;
+ (d) viewing of a department cumulative salary budget
+ (e) viewing a team by manager
+ (e) removing an employee
  
 plus several delete functions which I did not attempt as doing so would require ensuring that subsequent updates be made across all the tables in the event that important keys for department, role and employee so that things didn't break after the deletion. 
 
