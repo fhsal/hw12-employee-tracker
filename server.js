@@ -33,7 +33,7 @@ function selectAction() {
         "View departments",
         "View employees",
         "View roles",
-        "View a team",
+        "View a team by manager",
         "Add employee",
         "Add department",
         "Add role",
