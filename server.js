@@ -20,7 +20,7 @@ connection.connect(function(err) {
   if (err) throw err;
   console.log("connected as id " + connection.threadId);
   selectAction();
-  //  connection.end();//
+
 });
 
 //prompt user with actions using inquirer
@@ -38,19 +38,14 @@ function selectAction() {
         "Add role",
         "Search for an employee",
         "View department salary budget",
-        // "Update employee role",
+        "Update employee role",
         "Remove an employee",
-        // "View employees by Manager",
-        // "View a department budget",
-        // "Delete a role",
-        // "Delete a department",
       ],
       message: "Welcome to the Employee Tracker!  Choose an action",
       name: "action"
     })
     .then(function(result) {
       console.log("You entered: " + result.action);
-
       switch (result.action) {
         case "View employees":
           viewEmployees();
@@ -82,7 +77,9 @@ function selectAction() {
         case "Remove an employee":
           removeEmployee();
           break;
-
+        case "Update employee role":
+          updateEmployee();
+          break;
       }
     });
 }
@@ -108,7 +105,7 @@ function viewRoles() {
   }
   
   function viewEmployees() {
-    let query = "SELECT * FROM emp";
+    let query = "SELECT  role.title, emp.role_id, role.department_id, emp.last_name, emp.first_name, emp.id FROM emp INNER JOIN role ON role.id=emp.role_id ORDER BY emp.role_id";
     connection.query(query, function(err, res) {
       if (err) throw err;
       console.table(res);
@@ -116,31 +113,30 @@ function viewRoles() {
     });
   }
 
-
 function viewSingleEmployee() {
-
     var query = "SELECT last_name, first_name, role_id, manager_id FROM emp WHERE ?";
     connection.query(query, { last_name: lastName }, function(err, res) {
       if (err) throw err;}
     )}
 
+function employeeSearch() {
+  inquirer
+    .prompt({
+      name: "lastName",
+      type: "input",
+      message: "Enter last name of employee you would like to view"
+    })
+    .then(function(answer) {
+      var query = "SELECT last_name, first_name, role_id, manager_id FROM emp WHERE ?";
+      connection.query(query, { last_name: answer.lastName }, function(err, res) {
+        if (err) throw err;
+        console.table(res);
+        selectAction();
+      });
+    });
+}
 
-    function employeeSearch() {
-      inquirer
-        .prompt({
-          name: "lastName",
-          type: "input",
-          message: "Enter last name of employee you would like to view"
-        })
-        .then(function(answer) {
-          var query = "SELECT last_name, first_name, role_id, manager_id FROM emp WHERE ?";
-          connection.query(query, { last_name: answer.lastName }, function(err, res) {
-            if (err) throw err;
-            console.table(res);
-            selectAction();
-          });
-        });
-    }
+// function to show department salary budget
 
 function viewDeptBudget(){
 
@@ -155,22 +151,13 @@ function viewDeptBudget(){
 // query joins three tables:  role, emp and dept 
 
       var query = "SELECT role.department_id, dept.deptName, SUM(salary) FROM emp INNER JOIN role ON role.id=emp.role_id JOIN dept ON role.department_id=dept.id WHERE ?";
-
       connection.query(query, { department_id: answer.deptID }, function(err, res) {
         if (err) throw err;
         console.table(res);
         selectAction();
       });
     });
-  
-  
   }
-
-
-
-
-
-
 
 // functions to add employee, role and dept 
 
@@ -201,13 +188,9 @@ function viewDeptBudget(){
       .then(function(answer) {
         connection.query("INSERT INTO emp (last_name, first_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [answer.lastName, answer.firstName, answer.roleID, answer.managerID], function(err, res) {
           if (err) throw err;
-          // let entry = "select * from emp WHERE last_name = lastName AND firstName = firstName";
-          console.table(res);
-          // console.log(entry);
-          console.log("Here is the updated employee listing");   
-          // viewSingleEmployee(answer.lastName, answer.firstName)        
-          // viewEmployees();   
-          viewSingleEmployee(answer.lastName);      
+          // console.table(res);
+          console.log("Here is the updated employee listing");         
+          viewEmployees();       
         });
       });
     }
@@ -252,6 +235,33 @@ function viewDeptBudget(){
       })
   }
 
+// function to update an employee role
+
+  function updateEmployee() {
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          message: "Enter id of employee you want to update",
+          name: "empID"
+        },
+        {
+          type: "input",
+          message: "Enter new role ID for the employee",
+          name: "newRole"
+        }
+      ])
+      .then(function(answer) {
+        connection.query('UPDATE emp SET role_id=? WHERE id= ?',[answer.newRole, answer.empID],function(err, res) {
+          if (err) throw err;
+          viewEmployees();
+        });
+      });
+  }
+
+
+  // function to remove an employee
+
   function removeEmployee() {
     inquirer.prompt({
         type: "input",
@@ -262,8 +272,22 @@ function viewDeptBudget(){
         connection.query("DELETE FROM emp WHERE id = ?", [answer.empID], function(err, res) {
             if (err) throw err;
             viewEmployees();
-            selectAction();
        })
     })
 }
 
+// function to remove a department 
+
+function removeDept() {
+  inquirer.prompt({
+      type: "input",
+      message: "Enter ID of department to remove",
+      name: "deptID"
+  }).then(function(answer){
+    // let value = [answer.empID];
+      connection.query("DELETE FROM dept WHERE id = ?", [answer.deptID], function(err, res) {
+          if (err) throw err;
+          viewDepartment();
+     })
+  })
+}
