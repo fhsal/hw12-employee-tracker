@@ -33,6 +33,7 @@ function selectAction() {
         "View departments",
         "View employees",
         "View roles",
+        "View a team",
         "Add employee",
         "Add department",
         "Add role",
@@ -55,6 +56,9 @@ function selectAction() {
           break;
         case "View departments":
           viewDepartment();
+          break;
+        case "View a team":
+          managerSearch();
           break;
         case "Add department":
           addDepartment();
@@ -105,7 +109,7 @@ function viewRoles() {
   }
   
   function viewEmployees() {
-    let query = "SELECT  role.title, emp.role_id, role.department_id, emp.last_name, emp.first_name, emp.id FROM emp INNER JOIN role ON role.id=emp.role_id ORDER BY emp.role_id";
+    let query = "SELECT  role.title, emp.role_id, role.department_id, emp.manager_id, emp.last_name, emp.first_name, emp.id FROM emp INNER JOIN role ON role.id=emp.role_id ORDER BY emp.role_id";
     connection.query(query, function(err, res) {
       if (err) throw err;
       console.table(res);
@@ -113,11 +117,11 @@ function viewRoles() {
     });
   }
 
-function viewSingleEmployee() {
-    var query = "SELECT last_name, first_name, role_id, manager_id FROM emp WHERE ?";
-    connection.query(query, { last_name: lastName }, function(err, res) {
-      if (err) throw err;}
-    )}
+// function viewSingleEmployee() {
+//     var query = "SELECT last_name, first_name, role_id, manager_id FROM emp WHERE ?";
+//     connection.query(query, { last_name: lastName }, function(err, res) {
+//       if (err) throw err;}
+//     )}
 
 function employeeSearch() {
   inquirer
@@ -129,6 +133,23 @@ function employeeSearch() {
     .then(function(answer) {
       var query = "SELECT last_name, first_name, role_id, manager_id FROM emp WHERE ?";
       connection.query(query, { last_name: answer.lastName }, function(err, res) {
+        if (err) throw err;
+        console.table(res);
+        selectAction();
+      });
+    });
+}
+
+function managerSearch() {
+  inquirer
+    .prompt({
+      name: "managerID",
+      type: "input",
+      message: "Enter ID of Manager of team you would like to see"
+    })
+    .then(function(answer) {
+      var query = "SELECT last_name, first_name, role_id FROM emp WHERE manager_id = ?";
+      connection.query(query, [answer.managerID], function(err, res) {
         if (err) throw err;
         console.table(res);
         selectAction();
