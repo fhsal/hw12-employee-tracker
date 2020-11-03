@@ -2,8 +2,8 @@
 
 const inquirer = require("inquirer");
 const mysql = require("mysql");
-// const cTable = require("console.table");
-// const db = require(".");
+
+// setting up database connection
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -11,16 +11,6 @@ const connection = mysql.createConnection({
   user: "root",
   password: "password",
   database: "employee_db"
-});
-
-
-// verify the below is really needed 
-
-connection.connect(function(err) {
-  if (err) throw err;
-  console.log("connected as id " + connection.threadId);
-  selectAction();
-
 });
 
 //prompt user with actions using inquirer
@@ -57,7 +47,7 @@ function selectAction() {
         case "View departments":
           viewDepartment();
           break;
-        case "View a team":
+        case "View a team by manager":
           managerSearch();
           break;
         case "Add department":
@@ -116,12 +106,6 @@ function viewRoles() {
       selectAction();
     });
   }
-
-// function viewSingleEmployee() {
-//     var query = "SELECT last_name, first_name, role_id, manager_id FROM emp WHERE ?";
-//     connection.query(query, { last_name: lastName }, function(err, res) {
-//       if (err) throw err;}
-//     )}
 
 function employeeSearch() {
   inquirer
@@ -312,3 +296,5 @@ function removeDept() {
      })
   })
 }
+
+selectAction();
