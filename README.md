@@ -1,5 +1,10 @@
 # Unit 12 MySQL Homework: Employee Tracker
 
+Link to a recording of the working application is below:
+
+https://drive.google.com/file/d/1ack10yqcit2XtWt21D5swQxLVztbc0Aj/view
+
+
 ## Summary
 
 This assignment involved building a node.js command line application to manage employee information.  The instructions specified creating three SQL tables for employee, department and role to allow a user to perform the functions of:
@@ -22,9 +27,7 @@ The functions summarized above are all contained within server.js.  The flow of 
 
 Several of the view and update functions involve joining the table information so that descriptive information such as department name can be brought together with information on roles and employees, which are kept in separate tables. 
 
-Link to a recording of the working application is below:
 
-https://drive.google.com/file/d/1ack10yqcit2XtWt21D5swQxLVztbc0Aj/view
 
 
 
