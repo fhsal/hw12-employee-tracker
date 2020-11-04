@@ -1,8 +1,6 @@
 # Unit 12 MySQL Homework: Employee Tracker
 
-Link to a recording of the working application is below:
-
-https://drive.google.com/file/d/1ack10yqcit2XtWt21D5swQxLVztbc0Aj/view
+Link to a recording of the working application:   https://drive.google.com/file/d/1ack10yqcit2XtWt21D5swQxLVztbc0Aj/view
 
 
 ## Summary
